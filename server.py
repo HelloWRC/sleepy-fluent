@@ -5,6 +5,7 @@ from flask import Flask, render_template, request, make_response
 from markupsafe import escape
 from datetime import datetime
 import pytz
+import os
 
 import utils as u
 from config import config as config_init
@@ -15,6 +16,9 @@ d = data_init()
 app = Flask(__name__)
 timezone = 'Asia/Shanghai'
 
+global SECRET_REAL
+SECRET_REAL = os.environ.get('SECRET')
+
 # --- Functions
 
 
@@ -22,7 +26,7 @@ def showip(req: request, msg): # type: ignore
     '''
     在日志中显示 ip
 
-    :param req: `flask.request` 对象, 用于取 ip
+    :param req: `flask.request` 对象，用于取 ip
     :param msg: 信息
     '''
     ip1 = req.remote_addr
@@ -168,7 +172,7 @@ def set_normal():
             message="argument 'status' must be a number"
         )
     secret = escape(request.args.get('secret'))
-    secret_real = c.get('secret')
+    secret_real = SECRET_REAL
     if secret == secret_real:
         d.dset('status', status)
         return u.format_dict({
@@ -186,13 +190,13 @@ def set_normal():
 @app.route('/set/<secret>/<int:status>')
 def set_path(secret, status):
     '''
-    set 设置状态, 但参数直接写路径里
+    set 设置状态，但参数直接写路径里
     - http[s]://<your-domain>[:your-port]/set/<your-secret>/<a-number>
     - Method: **GET**
     '''
     showip(request, '/set/<secret>/<status>')
     secret = escape(secret)
-    secret_real = c.get('secret')
+    secret_real = SECRET_REAL
     if secret == secret_real:
         d.dset('status', status)
         ret = {
@@ -231,7 +235,7 @@ def device_set():
                 message='missing param or wrong param type'
             )
         secret = escape(request.args.get('secret'))
-        secret_real = c.get('secret')
+        secret_real = SECRET_REAL
         if secret == secret_real:
             devices: dict = d.dget('device_status')
             devices[device_id] = {
@@ -258,7 +262,7 @@ def device_set():
                 code='bad request',
                 message='missing param'
             )
-        secret_real = c.get('secret')
+        secret_real = SECRET_REAL
         if secret == secret_real:
             devices: dict = d.dget('device_status')
             devices[device_id] = {
@@ -292,7 +296,7 @@ def remove_device():
     showip(request, '/device/remove')
     device_id = escape(request.args.get('id'))
     secret = escape(request.args.get('secret'))
-    secret_real = c.get('secret')
+    secret_real = SECRET_REAL
     if secret == secret_real:
         try:
             del d.data['device_status'][device_id]
@@ -321,7 +325,7 @@ def clear_device():
     '''
     showip(request, '/device/clear')
     secret = escape(request.args.get('secret'))
-    secret_real = c.get('secret')
+    secret_real = SECRET_REAL
     if secret == secret_real:
         d.data['device_status'] = {}
         d.data['last_updated'] = datetime.now(pytz.timezone(timezone)).strftime('%Y-%m-%d %H:%M:%S')
@@ -346,7 +350,7 @@ def reload_config():
     '''
     showip(request, '/reload_config')
     secret = escape(request.args.get('secret'))
-    secret_real = c.get('secret')
+    secret_real = SECRET_REAL
     if secret == secret_real:
         c.load()
         return u.format_dict({
@@ -368,7 +372,7 @@ def save_data():
     '''
     showip(request, '/save_data')
     secret = escape(request.args.get('secret'))
-    secret_real = c.get('secret')
+    secret_real = SECRET_REAL
     if secret == secret_real:
         d.save()
         return u.format_dict({
