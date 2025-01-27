@@ -22,12 +22,12 @@
     "refresh": 5000, 
     "data_check_interval": 30, 
     "other": { 
-        "user": "HelloWRC", 
+        "user": "ClassIsland Developers", 
         "background": "https://imgapi.siiway.top/image", 
         
         "alpha": 0.85, 
-        "learn_more": "GitHub Repo", 
-        "repo": "https://github.com/wyf9/sleepy", 
+        "learn_more": "GitHub", 
+        "repo": "https://github.com/ClassIsland", 
         "more_text": "", 
         
         "device_status_slice": 30 
